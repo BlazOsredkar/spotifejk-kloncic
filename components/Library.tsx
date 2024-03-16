@@ -1,11 +1,23 @@
 "use client";
 
+import useAuthModal from "@/hooks/useAuthModal";
+import useUploadModal from "@/hooks/useUploadModal";
+import { useUser } from "@/hooks/useUser";
 import { AiOutlinePlus } from "react-icons/ai";
 import { TbPlaylist } from "react-icons/tb";
 
 const Library: React.FC = () => {
+  const authModal = useAuthModal();
+  const { user } = useUser();
+  const uploadModal = useUploadModal();
   const onClick = () => {
-    // do something
+    if (!user) {
+      return authModal.onOpen();
+    }
+
+    
+
+    return uploadModal.onOpen();
   };
   return (
     <div className="flex flex-col">
