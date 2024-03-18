@@ -66,7 +66,7 @@ const AccountContent = () => {
           >
             Open customer portal
           </Button>
-          {(subscription?.child_count || 0) < maxMembers && (
+          {(subscription?.child_count || 0) < maxMembers && !subscription?.parent_id && (
             <Button onClick={addToFamModal.onOpen} className="w-[300px]">
               Add users to subscription
             </Button>
