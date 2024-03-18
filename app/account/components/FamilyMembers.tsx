@@ -25,7 +25,10 @@ const FamilyMembers: React.FC<FamilyMembersProps> = ({ familyMembers }) => {
         <div key={member.id}>
           <h1>Subscription Members</h1>
           <p>{member.full_name || "No name"}</p>
-          <Button onClick={() => removeUserFromFamily(member.id)}>
+          <Button
+            onClick={() => removeUserFromFamily(member.id)}
+            className="w-[300px]"
+          >
             Remove Member
           </Button>
         </div>
