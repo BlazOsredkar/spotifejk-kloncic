@@ -82,9 +82,9 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
               disabled={isLoading || price.id === priceIdLoading}
               className="mb-4"
             >
-              {`Subscribe for ${formatPrice(price)} ${price.interval_count} ${
-                price.interval
-              }`}
+              {`Subscribe for ${product.name}: ${formatPrice(price)} - ${
+                price.interval_count
+              } ${price.interval}`}
             </Button>
           ));
         })}

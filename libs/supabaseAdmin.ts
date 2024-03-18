@@ -2,10 +2,12 @@ import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
 import { Database } from "@/types_db";
-import { Price, Product } from "@/types";
+import { Price, Product, Subscription } from "@/types";
 
 import { stripe } from "./stripe";
 import { toDateTime } from "./helpers";
+import uniqid from "uniqid";
+import { subscribe } from "diagnostics_channel";
 
 export const supabaseAdmin = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -157,7 +159,6 @@ const manageSubscriptionStatusChange = async (
     `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`
   );
 
-
   if (createAction && subscription.default_payment_method && uuid)
     //@ts-ignore
     await copyBillingDetailsToCustomer(
@@ -166,9 +167,76 @@ const manageSubscriptionStatusChange = async (
     );
 };
 
+const getUserByID = async (id: string) => {
+  const { data, error } = await supabaseAdmin
+    .from("users")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+const insertSubscription = async (subscription: Subscription) => {
+  // @ts-ignore
+  const { error } = await supabaseAdmin.from("subscriptions").insert([
+    {
+      id: uniqid(),
+      user_id: subscription.user_id,
+      parent_id: subscription.parent_id,
+      status: subscription.status,
+      price_id: subscription.price_id,
+      quantity: subscription.quantity,
+      cancel_at_period_end: subscription.cancel_at_period_end,
+      current_period_start: subscription.current_period_start,
+      current_period_end: subscription.current_period_end,
+      ended_at: subscription.ended_at,
+      cancel_at: subscription.cancel_at,
+      canceled_at: subscription.canceled_at,
+      trial_start: subscription.trial_start,
+      trial_end: subscription.trial_end,
+    },
+  ]);
+  if (error) throw error;
+  console.log(`Inserted/updated subscription [${subscription.id}]`);
+  return subscription;
+};
+
+const removeMemberFromFamily = async (parent_id: string, user_id: string) => {
+  const { error } = await supabaseAdmin
+    .from("subscriptions")
+    .delete()
+    .eq("parent_id", parent_id)
+    .eq("user_id", user_id);
+  if (error) throw error;
+}
+
+const getFamilyMembersSub = async (subscription_id: string) => {
+  const { data, error } = await supabaseAdmin
+    .from("subscriptions")
+    .select("*")
+    .eq("parent_id", subscription_id);
+  if (error) throw error;
+  return data;
+};
+
+const getFamilyMembersUsr = async (user_ids: string[]) => {
+  const { data, error } = await supabaseAdmin
+    .from("users")
+    .select("*")
+    .in("id", user_ids);
+  if (error) throw error;
+  return data;
+}
+
 export {
   upsertProductRecord,
   upsertPriceRecord,
   createOrRetrieveCustomer,
   manageSubscriptionStatusChange,
+  getUserByID,
+  insertSubscription,
+  getFamilyMembersSub,
+  getFamilyMembersUsr,
+  removeMemberFromFamily,
 };

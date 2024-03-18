@@ -1,7 +1,5 @@
 import Stripe from "stripe";
 
-
-
 export interface Song {
   id: string;
   user_id: string;
@@ -66,4 +64,14 @@ export interface Subscription {
   trial_start?: string;
   trial_end?: string;
   prices?: Price;
+  parent_id?: string;
+  child_count?: number;
+}
+
+export interface SubscriptionWithUser extends Subscription {
+  user?: {
+    id: string;
+    full_name: string;
+    avatar_url: string;
+  };
 }

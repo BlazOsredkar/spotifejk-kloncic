@@ -5,13 +5,20 @@ import useSubscribeModal from "@/hooks/useSubscribeModal";
 import { useUser } from "@/hooks/useUser";
 import { postData } from "@/libs/helpers";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import AddUsersToFam from "./AddUsersToFam";
+import useAddToFamModal from "@/hooks/useAddToFamModal";
+import { metadata } from "@/app/layout";
 
 const AccountContent = () => {
   const router = useRouter();
   const subscribeModal = useSubscribeModal();
   const { isLoading, subscription, user } = useUser();
+  const addToFamModal = useAddToFamModal();
+  const maxMembers = useMemo<number>(() => {
+    return (subscription?.prices?.products?.metadata?.members || 0) as number;
+  }, [subscription?.prices?.products?.metadata]);
 
   const [loading, setLoading] = useState(false);
 
@@ -59,6 +66,11 @@ const AccountContent = () => {
           >
             Open customer portal
           </Button>
+          {(subscription?.child_count || 0) < maxMembers && (
+            <Button onClick={addToFamModal.onOpen} className="w-[300px]">
+              Add users to subscription
+            </Button>
+          )}
         </div>
       )}
     </div>

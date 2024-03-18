@@ -1,7 +1,10 @@
 import Header from "@/components/Header";
 import AccountContent from "./components/AccountContent";
+import { getFamilyMembers } from "@/server/getFamilyMembers";
+import FamilyMembers from "./components/FamilyMembers";
 
-const Account = () => {
+const Account = async () => {
+  const familyMembers = await getFamilyMembers();
   return (
     <div className="bg-neutral-900 rounded-lg h-full w-full overflow-hidden overflow-y-auto">
       <Header className="from-bg-neutral-900">
@@ -12,6 +15,7 @@ const Account = () => {
         </div>
       </Header>
       <AccountContent />
+      <FamilyMembers familyMembers={familyMembers} />
     </div>
   );
 };
