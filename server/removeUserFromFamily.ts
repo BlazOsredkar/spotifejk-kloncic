@@ -19,17 +19,25 @@ export async function removeUserFromFamily(userId: string) {
     .single();
 
   if (subError) {
-    console.error(subError);
-    return;
+    return {
+      error: subError.message,
+    };
   }
   const subscription = subData as Subscription;
 
   if (!userId) {
-    console.error("No id provided");
-    return;
+    return {
+      error: "No id provided",
+    };
   }
 
   const user = await getUserByID(userId);
+
+  if (!user) {
+    return {
+      error: "User not found",
+    };
+  }
 
   await removeMemberFromFamily(subscription.id, user.id);
 
