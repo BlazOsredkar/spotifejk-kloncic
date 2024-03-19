@@ -26,8 +26,9 @@ export async function addUserToFamily(formData: FormData) {
     .single();
 
   if (subError) {
-    console.error(subError);
-    return;
+    return {
+      error: subError.message,
+    };
   }
   const subscription = subData as Subscription;
 
@@ -51,6 +52,11 @@ export async function addUserToFamily(formData: FormData) {
   }
 
   const user = await getUserByID(userID);
+  if (!user) {
+    return {
+      error: "User not found",
+    };
+  }
 
   if (user.id === subscription.user_id) {
     return {

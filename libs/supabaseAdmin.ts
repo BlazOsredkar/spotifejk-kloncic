@@ -173,7 +173,7 @@ const getUserByID = async (id: string) => {
     .select("*")
     .eq("id", id)
     .single();
-  if (error) throw error;
+  if (error) return null;
   return data;
 };
 
@@ -209,7 +209,7 @@ const removeMemberFromFamily = async (parent_id: string, user_id: string) => {
     .eq("parent_id", parent_id)
     .eq("user_id", user_id);
   if (error) throw error;
-}
+};
 
 const getFamilyMembersSub = async (subscription_id: string) => {
   const { data, error } = await supabaseAdmin
@@ -227,7 +227,7 @@ const getFamilyMembersUsr = async (user_ids: string[]) => {
     .in("id", user_ids);
   if (error) throw error;
   return data;
-}
+};
 
 export {
   upsertProductRecord,
