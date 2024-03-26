@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 const AddUsersToFam = () => {
   
   const { isLoading, subscription, user } = useUser();
+  const [isAdding, setIsAdding] = useState(false);
   const addToFamModal = useAddToFamModal();
 
   const maxMembers = useMemo<number>(() => {
@@ -25,6 +26,7 @@ const AddUsersToFam = () => {
   };
 
   const handleFormAction = async (data: FormData) => {
+    setIsAdding(true);
     const response = await addUserToFamily(data);
     if (response?.error) {
       toast.error(response.error);
