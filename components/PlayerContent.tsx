@@ -7,12 +7,15 @@ import { BsPauseFill, BsPlayFill } from "react-icons/bs";
 import { HiSpeakerWave, HiSpeakerXMark } from "react-icons/hi2";
 import { AiFillStepBackward, AiFillStepForward } from "react-icons/ai";
 
+
 import { Song } from "@/types";
 import usePlayer from "@/hooks/usePlayer";
 
 import LikeButton from "./LikeButton";
 import MediaItem from "./MediaItem";
 import Slider from "./Slider";
+import MusicSlider from "./MusicSlider";
+import MusicTime from "./MusicTime";
 
 interface PlayerContentProps {
   song: Song;
@@ -23,6 +26,13 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
   const player = usePlayer();
   const [volume, setVolume] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [seekPosition, setSeekPosition] = useState(0); // State to track the seek position
+  const [musicProgress, setMusicProgress] = useState(0);
+
+
+  // Function to handle seek position change
+  
+
 
   const Icon = isPlaying ? BsPauseFill : BsPlayFill;
   const VolumeIcon = volume === 0 ? HiSpeakerXMark : HiSpeakerWave;
@@ -79,6 +89,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
   const handlePlay = () => {
     if (!isPlaying) {
       play();
+
     } else {
       pause();
     }
@@ -89,6 +100,33 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
       setVolume(1);
     } else {
       setVolume(0);
+    }
+  };
+
+  useEffect(() => {
+    const updateProgress = () => {
+      if (sound) {
+        // Get the current position of the music and update the musicProgress state
+        setMusicProgress(sound.seek());
+      }
+    };
+
+    // Update the music progress every 100 milliseconds
+    const interval = setInterval(updateProgress, 100);
+
+    // Clear the interval on component unmount
+    return () => clearInterval(interval);
+  }, [sound]);
+
+
+
+  const handleSeek = (value: number) => {
+    setSeekPosition(value);
+    console.log(value);
+    if (sound) {
+      //play from the seek position
+      console.log(sound.duration());
+      sound.seek(value);
     }
   };
 
@@ -105,7 +143,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
         className="
             flex 
             md:hidden 
-            col-auto 
+            row-span-2
             w-full 
             justify-end 
             items-center
@@ -136,24 +174,35 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
             md:flex 
             justify-center 
             items-center 
+            row-span-1
             w-full 
-            max-w-[722px] 
+             
             gap-x-6
+            flex-col
           "
       >
-        <AiFillStepBackward
-          onClick={onPlayPrevious}
-          size={30}
-          className="
+        <div className="flex gap-x-4 w-full items-center">
+          <MusicTime currentTime={musicProgress} />
+          <MusicSlider
+            value={musicProgress}
+            onChange={handleSeek}
+            duration={sound?.duration() || 1}
+          />
+        </div>
+        <div className="flex gap-x-4 items-center pb-4">
+          <AiFillStepBackward
+            onClick={onPlayPrevious}
+            size={30}
+            className="
               text-neutral-400 
               cursor-pointer 
               hover:text-white 
               transition
             "
-        />
-        <div
-          onClick={handlePlay}
-          className="
+          />
+          <div
+            onClick={handlePlay}
+            className="
               flex 
               items-center 
               justify-center
@@ -164,19 +213,20 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
               p-1 
               cursor-pointer
             "
-        >
-          <Icon size={30} className="text-black" />
-        </div>
-        <AiFillStepForward
-          onClick={onPlayNext}
-          size={30}
-          className="
+          >
+            <Icon size={30} className="text-black" />
+          </div>
+          <AiFillStepForward
+            onClick={onPlayNext}
+            size={30}
+            className="
               text-neutral-400 
               cursor-pointer 
               hover:text-white 
               transition
             "
-        />
+          />
+        </div>
       </div>
 
       <div className="hidden md:flex w-full justify-end pr-2">
