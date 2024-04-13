@@ -9,15 +9,20 @@ const useOnPlay = (songs: Song[]) => {
   const authModal = useAuthModal();
   const { user, subscription } = useUser();
   const subscribeModal = useSubscribeModal();
+  const listened = localStorage.getItem("listened") ? parseInt(localStorage.getItem("listened")!) : 0;
 
   const onPlay = (id: string) => {
     if (!user) {
       return authModal.onOpen();
     }
 
-    if (!subscription) {
+    //TODO
+    if (!subscription && listened >= 3) {
+      localStorage.setItem("listened", "0");
       return subscribeModal.onOpen();
+      
     }
+
 
     player.setId(id);
     player.setIds(songs.map((song) => song.id));

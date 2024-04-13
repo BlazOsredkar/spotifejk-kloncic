@@ -16,6 +16,8 @@ import MediaItem from "./MediaItem";
 import Slider from "./Slider";
 import MusicSlider from "./MusicSlider";
 import MusicTime from "./MusicTime";
+import useSubscribeModal from "@/hooks/useSubscribeModal";
+import { useUser } from "@/hooks/useUser";
 
 interface PlayerContentProps {
   song: Song;
@@ -24,11 +26,24 @@ interface PlayerContentProps {
 
 const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
   const player = usePlayer();
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(localStorage.getItem("volume") ? parseFloat(localStorage.getItem("volume")!) : 1);
+  const [listened, setListened] = useState(localStorage.getItem("listened") ? parseInt(localStorage.getItem("listened")!) : 0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [seekPosition, setSeekPosition] = useState(0); // State to track the seek position
   const [musicProgress, setMusicProgress] = useState(0);
+  const subscribeModal = useSubscribeModal();
+  const { user, subscription } = useUser();
 
+
+  //save the volume in a cookie
+  useEffect(() => {
+    localStorage.setItem("volume", volume.toString());
+  }, [volume]);
+
+  // save the listened state in a cookie
+  useEffect(() => {
+    localStorage.setItem("listened", listened.toString());
+  }, [listened]);
 
   // Function to handle seek position change
   
@@ -48,8 +63,17 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
     if (!nextSong) {
       return player.setId(player.ids[0]);
     }
+    if (!subscription) {
+      listened: localStorage.setItem("listened", (listened + 1).toString());
+    }
 
-    player.setId(nextSong);
+    if (listened >= 2 && !subscription) {
+      localStorage.setItem("listened", "0");
+      //play an ad
+      return subscribeModal.onOpen();
+    } else {
+      player.setId(nextSong);
+    }
   };
 
   const onPlayPrevious = () => {
@@ -68,11 +92,22 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
   };
 
   const [play, { pause, sound }] = useSound(songUrl, {
-    volume: volume,
+    volume: localStorage.getItem("volume") ? parseFloat(localStorage.getItem("volume")!) : 1,
     onplay: () => setIsPlaying(true),
     onend: () => {
       setIsPlaying(false);
-      onPlayNext();
+      //add a +1 to the listened state
+      if (!subscription) {
+        listened: localStorage.setItem("listened", (listened + 1).toString());
+      }
+      if (listened >= 2 && !subscription) {
+        localStorage.setItem("listened", "0");
+        //play an ad
+        return subscribeModal.onOpen();
+      } else {
+        onPlayNext();
+      }
+
     },
     onpause: () => setIsPlaying(false),
     format: ["mp3"],
