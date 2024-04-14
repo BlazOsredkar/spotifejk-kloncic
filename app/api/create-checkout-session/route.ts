@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         mode: "subscription",
         allow_promotion_codes: true,
         subscription_data: {
-            trial_period_days: 0, // Replace with the desired trial period duration in days
+            trial_period_days: 1, // Replace with the desired trial period duration in days
             metadata,
         },
         success_url: `${getURL()}/account`,

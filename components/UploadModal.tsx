@@ -85,6 +85,7 @@ const UploadModal = () => {
           author: values.author,
           image_path: imageData.path,
           song_path: songData.path,
+          ad: values.ad,
         });
 
       if (supabaseError) {
@@ -143,6 +144,15 @@ const UploadModal = () => {
             accept="image/*"
             {...register("image", { required: true })}
           />
+        </div>
+        <div>
+          <Input
+            id="ad"
+            type="checkbox"
+            disabled={isLoading}
+            {...register("ad")}
+          />
+          <label htmlFor="ad">Ad</label>
         </div>
         <Button disabled={isLoading} type="submit">
           Create
