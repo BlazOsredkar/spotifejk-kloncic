@@ -45,15 +45,11 @@ const AccountContent = () => {
 
   return (
     <div className="mb-7 px-6">
-      <h1 className="text-3xl font-bold mb-4">
-        {user?.email  "User"}
-      </h1>
+      <h1 className="text-3xl font-bold mb-4">{user?.email ?? "User"}</h1>
       <p className="text-lg mb-4">
-        {user?.user_metadata?.full_name  "Full name"}
+        {user?.user_metadata?.full_name ?? "Full name"}
       </p>
-      <p className="text-lg mb-4">
-        {user?.id || "User ID"}
-      </p>
+      <p className="text-lg mb-4">{user?.id || "User ID"}</p>
       {!subscription && (
         <div className="flex flex-col gap-y-4">
           <p>No active subscriptions</p>
@@ -75,11 +71,12 @@ const AccountContent = () => {
           >
             Open customer portal
           </Button>
-          {(subscription?.child_count || 0) < maxMembers && !subscription?.parent_id && (
-            <Button onClick={addToFamModal.onOpen} className="w-[300px]">
-              Add users to subscription
-            </Button>
-          )}
+          {(subscription?.child_count || 0) < maxMembers &&
+            !subscription?.parent_id && (
+              <Button onClick={addToFamModal.onOpen} className="w-[300px]">
+                Add users to subscription
+              </Button>
+            )}
         </div>
       )}
     </div>

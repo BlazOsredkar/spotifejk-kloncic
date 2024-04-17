@@ -15,9 +15,8 @@ const useOnPlay = (songs: Song[]) => {
       return authModal.onOpen();
     }
 
-
-
     player.setId(id);
+    // player.setIds(songs.map((song) => song.id)); add every 3 song to be ad with 20 id
     player.setIds(songs.map((song) => song.id));
   };
 

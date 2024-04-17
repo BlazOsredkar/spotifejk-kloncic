@@ -1,12 +1,11 @@
 "use client";
 
 // @ts-ignore
-import useSound from "use-sound"
-import { useEffect, useState } from "react";
+import useSound from "use-sound";
+import { useEffect, useMemo, useState } from "react";
 import { BsPauseFill, BsPlayFill } from "react-icons/bs";
 import { HiSpeakerWave, HiSpeakerXMark } from "react-icons/hi2";
 import { AiFillStepBackward, AiFillStepForward } from "react-icons/ai";
-
 
 import { Song } from "@/types";
 import usePlayer from "@/hooks/usePlayer";
@@ -18,46 +17,65 @@ import MusicSlider from "./MusicSlider";
 import MusicTime from "./MusicTime";
 import useSubscribeModal from "@/hooks/useSubscribeModal";
 import { useUser } from "@/hooks/useUser";
+import toast from "react-hot-toast";
 
 interface PlayerContentProps {
   song: Song;
   songUrl: string;
+  songAfterAdId: string | null;
+  setSongAfterAdId: (id: string | null) => void;
 }
 
-const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
+const PlayerContent: React.FC<PlayerContentProps> = ({
+  song,
+  songUrl,
+  songAfterAdId,
+  setSongAfterAdId,
+}) => {
   const player = usePlayer();
-  const [volume, setVolume] = useState(localStorage.getItem("volume") ? parseFloat(localStorage.getItem("volume")!) : 1);
-  const [listened, setListened] = useState(localStorage.getItem("listened") ? parseInt(localStorage.getItem("listened")!) : 0);
+  const [volume, setVolume] = useState(
+    localStorage.getItem("volume")
+      ? parseFloat(localStorage.getItem("volume")!)
+      : 1
+  );
+  const [listened, setListened] = useState(
+    localStorage.getItem("listened")
+      ? parseInt(localStorage.getItem("listened")!)
+      : 0
+  );
   const [isPlaying, setIsPlaying] = useState(false);
   const [seekPosition, setSeekPosition] = useState(0); // State to track the seek position
   const [musicProgress, setMusicProgress] = useState(0);
   const subscribeModal = useSubscribeModal();
   const { user, subscription } = useUser();
 
-
-  //save the volume in a cookie
   useEffect(() => {
     localStorage.setItem("volume", volume.toString());
   }, [volume]);
 
-  // save the listened state in a cookie
   useEffect(() => {
     localStorage.setItem("listened", listened.toString());
   }, [listened]);
 
-  // Function to handle seek position change
-  
-
-
   const Icon = isPlaying ? BsPauseFill : BsPlayFill;
   const VolumeIcon = volume === 0 ? HiSpeakerXMark : HiSpeakerWave;
 
-  const onPlayNext = () => {
+  const onPlayNext = (end: boolean = false) => {
     if (player.ids.length === 0) {
       return;
     }
+    if (end !== true && songAfterAdId !== null) {
+      toast.error("You need to listen to the ad first");
+      return;
+    }
 
-    const currentIndex = player.ids.findIndex((id) => id === player.activeId);
+    let currentIndex = player.ids.findIndex((id) => id === player.activeId);
+    console.log("SOng id after ad: " + songAfterAdId);
+    if (songAfterAdId) {
+      currentIndex = player.ids.findIndex((id) => id === songAfterAdId);
+      setSongAfterAdId(null);
+    }
+    console.log("Curent index" + currentIndex);
     const nextSong = player.ids[currentIndex + 1];
 
     if (!nextSong) {
@@ -69,8 +87,12 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
 
     if (listened >= 2 && !subscription) {
       localStorage.setItem("listened", "0");
-      //play an ad
-      return subscribeModal.onOpen();
+      //play the ad
+      //continue playing the songs
+      // player.setId(nextSong);
+      console.log("Playing ad: " + nextSong);
+      setSongAfterAdId(player.activeId!);
+      player.setId("20");
     } else {
       player.setId(nextSong);
     }
@@ -78,6 +100,11 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
 
   const onPlayPrevious = () => {
     if (player.ids.length === 0) {
+      return;
+    }
+
+    if (songAfterAdId !== null) {
+      toast.error("You need to listen to the ad first");
       return;
     }
 
@@ -92,7 +119,9 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
   };
 
   const [play, { pause, sound }] = useSound(songUrl, {
-    volume: localStorage.getItem("volume") ? parseFloat(localStorage.getItem("volume")!) : 1,
+    volume: localStorage.getItem("volume")
+      ? parseFloat(localStorage.getItem("volume")!)
+      : 1,
     onplay: () => setIsPlaying(true),
     onend: () => {
       setIsPlaying(false);
@@ -100,14 +129,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
       if (!subscription) {
         listened: localStorage.setItem("listened", (listened + 1).toString());
       }
-      if (listened >= 2 && !subscription) {
-        localStorage.setItem("listened", "0");
-        //play an ad
-        return subscribeModal.onOpen();
-      } else {
-        onPlayNext();
-      }
-
+      onPlayNext(true);
     },
     onpause: () => setIsPlaying(false),
     format: ["mp3"],
@@ -124,7 +146,6 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
   const handlePlay = () => {
     if (!isPlaying) {
       play();
-
     } else {
       pause();
     }
@@ -153,8 +174,6 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
     return () => clearInterval(interval);
   }, [sound]);
 
-
-
   const handleSeek = (value: number) => {
     setSeekPosition(value);
     console.log(value);
@@ -173,7 +192,6 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
           <LikeButton songId={song.id} />
         </div>
       </div>
-
       <div
         className="
             flex 

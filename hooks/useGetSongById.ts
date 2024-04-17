@@ -17,7 +17,7 @@ const useGetSongById = (id: string) => {
       const { data, error } = await supabaseClient
         .from("songs")
         .select("*")
-        .eq("ad", false)
+        // .eq("ad", false)
         .eq("id", id)
         .single();
       if (error) {
@@ -32,6 +32,5 @@ const useGetSongById = (id: string) => {
 
   return useMemo(() => ({ isLoading, song }), [isLoading, song]);
 };
-
 
 export default useGetSongById;
