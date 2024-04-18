@@ -45,11 +45,14 @@ const AccountContent = () => {
 
   return (
     <div className="mb-7 px-6">
-      <h1 className="text-3xl font-bold mb-4">{user?.email ?? "User"}</h1>
-      <p className="text-lg mb-4">
-        {user?.user_metadata?.full_name ?? "Full name"}
-      </p>
-      <p className="text-lg mb-4">{user?.id || "User ID"}</p>
+      <div className="text-lg mb-4 border border-#18a030-400 inline-block p-4 rounded-md" style={{ marginTop: '20px' }}>
+  <h1 className="text-3xl font-bold mb-4">{user?.email ?? "User"}</h1>
+  <p className="text-lg mb-4">
+      Name: {user?.user_metadata?.full_name ?? "Full name"}
+  </p>
+  <p className="text-lg mb-4">ID: {user?.id || "User ID"}</p>
+</div>
+
       {!subscription && (
         <div className="flex flex-col gap-y-4">
           <p>No active subscriptions</p>
