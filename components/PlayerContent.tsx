@@ -94,6 +94,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
       console.log("Playing ad: " + nextSong);
       setSongAfterAdId(player.activeId!);
       const randomAd = ad_ids[Math.floor(Math.random() * ad_ids.length)];
+
       player.setId(randomAd);
     } else {
       player.setId(nextSong);
@@ -177,21 +178,31 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
   }, [sound]);
 
   const handleSeek = (value: number) => {
+
+    
     setSeekPosition(value);
     console.log(value);
     if (sound) {
       //play from the seek position
       console.log(sound.duration());
-      sound.seek(value);
+      if(songAfterAdId !== null){
+      }else{
+        sound.seek(value);
+      }
     }
   };
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 h-full">
       <div className="flex w-full justify-start">
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-2">
           <MediaItem data={song} />
-          <LikeButton songId={song.id} />
+          {songAfterAdId && (
+            <div className="text-black bg-green-500 rounded-full text-center border-transparent px-1 py-1 disabled:cursor-not-allowed disabled:opacity-50 font-bold w-[60px]">
+              Ad
+            </div>
+          )}
+          {!songAfterAdId && <LikeButton songId={song.id} />}
         </div>
       </div>
       <div
@@ -242,6 +253,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
             value={musicProgress}
             onChange={handleSeek}
             duration={sound?.duration() || 1}
+            disabled={songAfterAdId !== null}
           />
         </div>
         <div className="flex gap-x-4 items-center pb-4">
