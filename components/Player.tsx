@@ -5,9 +5,13 @@ import useLoadSongUrl from "@/hooks/useLoadSongUrl";
 import useGetSongById from "@/hooks/useGetSongById";
 
 import PlayerContent from "./PlayerContent";
-import { useState } from "react";
+import { useState, FC } from "react";
 
-const Player = () => {
+interface PlayerProps {
+  ad_ids: string[];
+}
+
+const Player: FC<PlayerProps> = ({ ad_ids }) => {
   const player = usePlayer();
   const { song } = useGetSongById(player.activeId!);
   const [songAfterAdId, setSongAfterAdId] = useState<string | null>(null);
@@ -32,7 +36,14 @@ const Player = () => {
         items-center
       "
     >
-      <PlayerContent key={songUrl} song={song} songUrl={songUrl} songAfterAdId={songAfterAdId} setSongAfterAdId={setSongAfterAdId} />
+      <PlayerContent
+        key={songUrl}
+        song={song}
+        songUrl={songUrl}
+        songAfterAdId={songAfterAdId}
+        setSongAfterAdId={setSongAfterAdId}
+        ad_ids={ad_ids}
+      />
     </div>
   );
 };

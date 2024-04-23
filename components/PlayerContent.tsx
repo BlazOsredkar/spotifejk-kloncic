@@ -24,6 +24,7 @@ interface PlayerContentProps {
   songUrl: string;
   songAfterAdId: string | null;
   setSongAfterAdId: (id: string | null) => void;
+  ad_ids: string[];
 }
 
 const PlayerContent: React.FC<PlayerContentProps> = ({
@@ -31,6 +32,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
   songUrl,
   songAfterAdId,
   setSongAfterAdId,
+  ad_ids,
 }) => {
   const player = usePlayer();
   const [volume, setVolume] = useState(
@@ -70,7 +72,6 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
     }
 
     let currentIndex = player.ids.findIndex((id) => id === player.activeId);
-    console.log("SOng id after ad: " + songAfterAdId);
     if (songAfterAdId) {
       currentIndex = player.ids.findIndex((id) => id === songAfterAdId);
       setSongAfterAdId(null);
@@ -92,7 +93,8 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
       // player.setId(nextSong);
       console.log("Playing ad: " + nextSong);
       setSongAfterAdId(player.activeId!);
-      player.setId("20");
+      const randomAd = ad_ids[Math.floor(Math.random() * ad_ids.length)];
+      player.setId(randomAd);
     } else {
       player.setId(nextSong);
     }
@@ -194,11 +196,11 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
       </div>
       <div
         className="
-            flex 
-            md:hidden 
+            flex
+            md:hidden
             row-span-2
-            w-full 
-            justify-end 
+            w-full
+            justify-end
             items-center
           "
       >
@@ -207,12 +209,12 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
           className="
               h-10
               w-10
-              flex 
-              items-center 
-              justify-center 
-              rounded-full 
-              bg-white 
-              p-1 
+              flex
+              items-center
+              justify-center
+              rounded-full
+              bg-white
+              p-1
               cursor-pointer
             "
         >
@@ -224,12 +226,12 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
         className="
             hidden
             h-full
-            md:flex 
-            justify-center 
-            items-center 
+            md:flex
+            justify-center
+            items-center
             row-span-1
-            w-full 
-             
+            w-full
+
             gap-x-6
             flex-col
           "
@@ -247,35 +249,35 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
             onClick={onPlayPrevious}
             size={30}
             className="
-              text-neutral-400 
-              cursor-pointer 
-              hover:text-white 
+              text-neutral-400
+              cursor-pointer
+              hover:text-white
               transition
             "
           />
           <div
             onClick={handlePlay}
             className="
-              flex 
-              items-center 
+              flex
+              items-center
               justify-center
               h-10
-              w-10 
-              rounded-full 
-              bg-white 
-              p-1 
+              w-10
+              rounded-full
+              bg-white
+              p-1
               cursor-pointer
             "
           >
             <Icon size={30} className="text-black" />
           </div>
           <AiFillStepForward
-            onClick={onPlayNext}
+            onClick={() => onPlayNext()}
             size={30}
             className="
-              text-neutral-400 
-              cursor-pointer 
-              hover:text-white 
+              text-neutral-400
+              cursor-pointer
+              hover:text-white
               transition
             "
           />
