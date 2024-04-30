@@ -1,34 +1,33 @@
-"use client";
-
+import Client from 'client';
 import Button from "@/components/Button";
-import { removeUserFromFamily } from "@/server/removeUserFromFamily";
-import { SubscriptionWithUser } from "@/types";
+import { deleteUserFromGroup } from "@/server/deleteUserFromGroup";
+import { GroupMember } from "@/types";
 
-interface FamilyMembersProps {
-  familyMembers?: {
+interface GroupMembersProps {
+  members?: {
     id: string;
-    full_name: string;
-    avatar_url: string;
+    fullName: string;
+    avatarUrl: string;
   }[];
 }
 
-const FamilyMembers: React.FC<FamilyMembersProps> = ({ familyMembers }) => {
+const GroupMembers: React.FC<GroupMembersProps> = ({ members }) => {
     
-  if (!familyMembers) {
+  if (!members) {
     return (
       <></>
     );
   }
   return (
     <div className="mb-7 px-6">
-      {familyMembers.map((member) => (
+      {members.map((member) => (
         <div key={member.id} className="flex flex-col gap-y-4">
           <h1 className="text-white text-2xl font-semibold">
-            Added members to subscription
+            Group Members
           </h1>
-          <p>{member.full_name || "No name"}</p>
+          <p>{member.fullName || "No name"}</p>
           <Button
-            onClick={() => removeUserFromFamily(member.id)}
+            onClick={() => deleteUserFromGroup(member.id)}
             className="w-[300px]"
           >
             Remove Member
@@ -39,4 +38,4 @@ const FamilyMembers: React.FC<FamilyMembersProps> = ({ familyMembers }) => {
   );
 };
 
-export default FamilyMembers;
+export default GroupMembers;
