@@ -1,45 +1,44 @@
-"use client";
-
-import LikeButton from "@/components/LikeButton";
-import MediaItem from "@/components/MediaItem";
-import useOnPlay from "@/hooks/useOnPlay";
-import { useUser } from "@/hooks/useUser";
-import { Song } from "@/types";
-import { useRouter } from "next/navigation";
+import Client from 'client';
+import ThumbUpButton from "@/components/ThumbUpButton";
+import MediaCard from "@/components/MediaCard";
+import useMediaPlayback from "@/hooks/useMediaPlayback";
+import { useClient } from "@/hooks/useClient";
+import { MusicTrack } from "@/types";
+import { useRoute } from "next/navigation";
 import { useEffect } from "react";
 
 interface LikedContentProps {
-  songs: Song[];
+  tracks: MusicTrack[];
 }
 
-const LikedContent: React.FC<LikedContentProps> = ({ songs }) => {
-  const router = useRouter();
-  const { isLoading, user } = useUser();
+const LikedContent: React.FC<LikedContentProps> = ({ tracks }) => {
+  const route = useRoute();
+  const { loading, client } = useClient();
 
-  const onPlay = useOnPlay(songs);
+  const onPlay = useMediaPlayback(tracks);
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.replace("/");
+    if (!loading && !client) {
+      route.replace("/");
     }
-  }, [isLoading, user, router]);
+  }, [loading, client, route]);
 
-  if (songs.length === 0) {
+  if (tracks.length === 0) {
     return (
       <div className="flex flex-col gap-y-2 w-full px-6 text-neutral-400">
-        No liked songs
+        No liked tracks
       </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-y-2 w-full p-6">
-      {songs.map((song) => (
-        <div key={song.id} className="flex items-center gap-x-4 w-full">
+      {tracks.map((track) => (
+        <div key={track.id} className="flex items-center gap-x-4 w-full">
           <div className="flex-1">
-            <MediaItem onClick={(id: string) => onPlay(id)} data={song} />
+            <MediaCard onClick={(id: string) => onPlay(id)} data={track} />
           </div>
-          <LikeButton songId={song.id} />
+          <ThumbUpButton trackId={track.id} />
         </div>
       ))}
     </div>
