@@ -1,13 +1,14 @@
-import Client from 'client';
-import Container from "@/components/Container";
+"use client";
+
+import Box from "@/components/Box";
 import { BounceLoader } from "react-spinners";
 
-const LoadingPage = () => {
+const Loading = () => {
   return (
-    <Container className="h-full flex items-center justify-center">
+    <Box className="h-full flex items-center justify-center">
       <BounceLoader color="#22c55e" size={40} />
-    </Container>
+    </Box>
   );
 };
 
-export default LoadingPage;
+export default Loading;
